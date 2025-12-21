@@ -1,13 +1,30 @@
+@import url("https://fonts.googleapis.com/css2?family=Merriweather:wght@400;700;900&display=swap");
+
 :root {
-  font-family: "Georgia", "Times New Roman", serif;
+  font-family: "Merriweather", "Georgia", serif;
   line-height: 1.5;
   font-weight: 400;
-  color: #1a1a1a;
-  background-color: #fbf8f1;
+  color: var(--text);
+  background-color: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  --bg: #0b1220;
+  --text: #eef2f7;
+  --grid-bg: #0f1a2a;
+  --cell-bg: #0f1a2a;
+  --cell-border: #203047;
+  --grid-border: #3b587d;
+  --selected: #203b5a;
+  --given-bg: #3a2f62;
+  --given-text: #f8ead6;
+  --note-text: #92a1b9;
+  --key-bg: #0f1a2a;
+  --key-border: #22324a;
+  --key-secondary: #152338;
+  --key-active: #233850;
 }
 
 body {
@@ -16,9 +33,28 @@ body {
   min-height: 100vh;
   display: grid;
   place-items: center;
+  background: var(--bg);
+  color: var(--text);
 }
 
 button {
   font-family: inherit;
   cursor: pointer;
+}
+
+:root[data-theme="light"] {
+  --bg: #fbf8f1;
+  --text: #1a1a1a;
+  --grid-bg: #f9f7f2;
+  --cell-bg: #f9f7f2;
+  --cell-border: #c9c5b8;
+  --grid-border: #1f1f1f;
+  --selected: #ffe7b6;
+  --given-bg: #eee4d4;
+  --given-text: #2f4f5f;
+  --note-text: #2f4f5f;
+  --key-bg: #ffffff;
+  --key-border: #c9c5b8;
+  --key-secondary: #f1efe8;
+  --key-active: #e8e2d3;
 }

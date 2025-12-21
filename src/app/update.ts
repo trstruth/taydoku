@@ -33,19 +33,22 @@ export const update = (model: Model, msg: Msg): Model => {
                     invalid: {
                         target: model.selected,
                         conflicts
-                    }
+                    },
+                    invalidPulse: model.invalidPulse + 1
                 }
             }
             const next = model.grid.slice()
             const nextNotes = model.notes.slice()
             next[model.selected] = msg.value
             nextNotes[model.selected] = []
+            const solved = isSolved(next)
             return {
                 ...model,
                 grid: next,
                 notes: nextNotes,
                 invalid: null,
-                solved: isSolved(next)
+                solved,
+                startedAt: solved ? null : model.startedAt
             }
         }
 
@@ -56,7 +59,7 @@ export const update = (model: Model, msg: Msg): Model => {
             const nextNotes = model.notes.slice()
             if (model.inputMode === "note") {
                 nextNotes[model.selected] = []
-                return { ...model, notes: nextNotes, invalid: null }
+            return { ...model, notes: nextNotes, invalid: null }
             }
             next[model.selected] = null
             return {
@@ -64,12 +67,13 @@ export const update = (model: Model, msg: Msg): Model => {
                 grid: next,
                 notes: nextNotes,
                 invalid: null,
-                solved: false
+                solved: false,
+                startedAt: model.startedAt
             }
         }
 
         case "NewGame":
-            const grid = generatePuzzle("easy")
+            const grid = generatePuzzle("hard")
             return {
                 grid,
                 givens: grid.map(cell => cell !== null),
@@ -77,7 +81,11 @@ export const update = (model: Model, msg: Msg): Model => {
                 inputMode: "value",
                 selected: null,
                 invalid: null,
-                solved: false
+                invalidPulse: 0,
+                solved: false,
+                theme: model.theme,
+                startedAt: Date.now(),
+                elapsedMs: 0
             }
 
         case "ClearInvalid":
@@ -88,6 +96,32 @@ export const update = (model: Model, msg: Msg): Model => {
             return {
                 ...model,
                 inputMode: model.inputMode === "note" ? "value" : "note"
+            }
+
+        case "ToggleTheme":
+            return {
+                ...model,
+                theme: model.theme === "dark" ? "light" : "dark"
+            }
+
+        case "Tick":
+            if (model.startedAt === null || model.solved) return model
+            return {
+                ...model,
+                elapsedMs: Date.now() - model.startedAt
+            }
+
+        case "Solve":
+            return {
+                ...model,
+                solved: true,
+                startedAt: null
+            }
+
+        case "DismissSolved":
+            return {
+                ...model,
+                solved: false
             }
 
         default:

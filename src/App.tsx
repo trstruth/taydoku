@@ -7,7 +7,7 @@ import { GridView } from "./ui/GridView"
 import { generatePuzzle } from "./domain/generator"
 
 const createModel = (): Model => {
-    const grid = generatePuzzle("easy")
+    const grid = generatePuzzle("hard")
     return {
         grid,
         givens: grid.map(cell => cell !== null),
@@ -15,7 +15,11 @@ const createModel = (): Model => {
         inputMode: "value",
         selected: null,
         invalid: null,
-        solved: false
+        invalidPulse: 0,
+        solved: false,
+        theme: "dark",
+        startedAt: Date.now(),
+        elapsedMs: 0
     }
 }
 

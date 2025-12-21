@@ -7,3 +7,7 @@ export type Msg =
     | { type: "NewGame" }
     | { type: "ClearInvalid" }
     | { type: "ToggleNoteMode" }
+    | { type: "ToggleTheme" }
+    | { type: "Tick" }
+    | { type: "Solve" }
+    | { type: "DismissSolved" }

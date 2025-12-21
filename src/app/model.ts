@@ -8,5 +8,9 @@ export type Model = {
     inputMode: "value" | "note"
     selected: number | null
     invalid: { target: number; conflicts: number[] } | null
+    invalidPulse: number
     solved: boolean
+    theme: "dark" | "light"
+    startedAt: number | null
+    elapsedMs: number
 }

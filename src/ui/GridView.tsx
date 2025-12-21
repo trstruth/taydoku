@@ -1,4 +1,5 @@
-import { For, Show, createEffect, onCleanup, onMount } from "solid-js"
+import { For, Index, Show, createEffect, onCleanup, onMount } from "solid-js"
+import confetti from "canvas-confetti"
 import type { Model } from "../app/model"
 import type { Msg } from "../app/msg"
 
@@ -7,7 +8,14 @@ export function GridView(props: {
     dispatch: (msg: Msg) => void
 }) {
     let rootRef: HTMLDivElement | undefined
-    const confettiPieces = Array.from({ length: 24 }, (_, i) => i)
+    let wasSolved = false
+
+    const formatElapsed = (ms: number) => {
+        const totalSeconds = Math.floor(ms / 1000)
+        const minutes = Math.floor(totalSeconds / 60)
+        const seconds = totalSeconds % 60
+        return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+    }
 
     onMount(() => {
         rootRef?.focus()
@@ -38,6 +46,41 @@ export function GridView(props: {
         onCleanup(() => clearTimeout(timeout))
     })
 
+    createEffect(() => {
+        if (props.model.solved && !wasSolved) {
+            const colors = ["#f9d65c", "#ef476f", "#48a9a6", "#8ecae6", "#c99700"]
+            const defaults = {
+                startVelocity: 34,
+                spread: 110,
+                ticks: 180,
+                gravity: 0.9,
+                scalar: 0.85,
+                zIndex: 4,
+                colors,
+                disableForReducedMotion: true
+            }
+            confetti({
+                ...defaults,
+                particleCount: 32,
+                angle: 90,
+                origin: { x: 0.5, y: 0.55 }
+            })
+        }
+        wasSolved = props.model.solved
+    })
+
+    createEffect(() => {
+        document.documentElement.dataset.theme = props.model.theme
+    })
+
+    createEffect(() => {
+        if (props.model.startedAt === null) return
+        const interval = setInterval(() => {
+            props.dispatch({ type: "Tick" })
+        }, 250)
+        onCleanup(() => clearInterval(interval))
+    })
+
     return (
         <div
             class="game"
@@ -47,37 +90,71 @@ export function GridView(props: {
             onClick={() => rootRef?.focus()}
         >
             <Show when={props.model.solved}>
-                <div class="confetti" aria-hidden="true">
-                    <For each={confettiPieces}>
-                        {(i) => (
-                            <span
-                                class="confetti-piece"
-                                style={{
-                                    "--x": `${(i * 37) % 100}%`,
-                                    "--delay": `${(i % 6) * 0.08}s`,
-                                    "--dur": `${1.6 + (i % 5) * 0.2}s`,
-                                    "--hue": `${(i * 29) % 360}`
-                                }}
-                            />
-                        )}
-                    </For>
+                <div class="modal-backdrop" />
+                <div class="modal" role="dialog" aria-live="polite">
+                    <div class="modal-card">
+                        <div class="modal-title">Puzzle solved</div>
+                        <div class="modal-time">
+                            {formatElapsed(props.model.elapsedMs)}
+                        </div>
+                        <div class="modal-subtitle">
+                            good job bebe!!!
+                        </div>
+                        <div class="modal-actions">
+                            <button
+                                class="key secondary"
+                                onClick={() => props.dispatch({ type: "DismissSolved" })}
+                            >
+                                Close
+                            </button>
+                            <button
+                                class="key secondary"
+                                onClick={() => props.dispatch({ type: "NewGame" })}
+                            >
+                                New Puzzle
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </Show>
-            <div class="grid" classList={{ invalid: !!props.model.invalid }}>
-                <For each={props.model.grid}>
+            <div class="toolbar">
+                <div class="timer">
+                    {formatElapsed(props.model.elapsedMs)}
+                </div>
+                <div class="toolbar-actions">
+                    <button
+                        class="key secondary"
+                        onClick={() => props.dispatch({ type: "ToggleTheme" })}
+                    >
+                        {props.model.theme === "dark" ? "Dark" : "Light"}
+                    </button>
+                </div>
+            </div>
+            <div
+                class="grid"
+                classList={{ invalid: !!props.model.invalid }}
+                style={{
+                    "animation-name": props.model.invalid
+                        ? props.model.invalidPulse % 2 === 0
+                            ? "invalid-flash"
+                            : "invalid-flash-alt"
+                        : "none"
+                }}
+            >
+                <Index each={props.model.grid}>
                     {(cell, i) => {
-                        const row = Math.floor(i() / 9)
-                        const col = i() % 9
-                        const invalidTarget = props.model.invalid?.target === i()
-                        const conflict = props.model.invalid?.conflicts.includes(i()) ?? false
+                        const row = Math.floor(i / 9)
+                        const col = i % 9
+                        const invalidTarget = props.model.invalid?.target === i
+                        const conflict = props.model.invalid?.conflicts.includes(i) ?? false
                         const flash = !!props.model.invalid && (invalidTarget || conflict)
-                        const notes = () => props.model.notes[i()]
+                        const notes = () => props.model.notes[i]
                         return (
                             <div
                                 class="cell"
                                 classList={{
-                                    selected: props.model.selected === i(),
-                                    given: props.model.givens[i()],
+                                    selected: props.model.selected === i,
+                                    given: props.model.givens[i],
                                     "invalid-target": invalidTarget,
                                     conflict,
                                     flash,
@@ -85,18 +162,18 @@ export function GridView(props: {
                                     "box-bottom": row === 2 || row === 5
                                 }}
                                 onClick={() =>
-                                    props.dispatch({ type: "SelectCell", index: i() })
+                                    props.dispatch({ type: "SelectCell", index: i })
                                 }
                             >
-                                <Show when={cell !== null}>
-                                    {cell}
+                                <Show when={cell() !== null}>
+                                    {cell()}
                                 </Show>
-                                <Show when={cell === null && notes().length > 0}>
+                                <Show when={cell() === null && notes().length > 0}>
                                     <div class="notes">
                                         <For each={[1, 2, 3, 4, 5, 6, 7, 8, 9]}>
-                                            {(value) => (
+                                            {(noteValue) => (
                                                 <span class="note">
-                                                    {notes().includes(value as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9) ? value : ""}
+                                                    {notes().includes(noteValue as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9) ? noteValue : ""}
                                                 </span>
                                             )}
                                         </For>
@@ -105,7 +182,7 @@ export function GridView(props: {
                             </div>
                         )
                     }}
-                </For>
+                </Index>
             </div>
             <div class="keypad">
                 <For each={[1, 2, 3, 4, 5, 6, 7, 8, 9]}>
