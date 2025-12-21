@@ -4,10 +4,11 @@ import type { Model } from "./app/model"
 import type { Msg } from "./app/msg"
 import { update } from "./app/update"
 import { GridView } from "./ui/GridView"
-import { generatePuzzle } from "./domain/generator"
+import { generatePuzzleFromText } from "./domain/generator"
+import puzzlesText from "../puzzles.txt?raw"
 
 const createModel = (): Model => {
-    const grid = generatePuzzle("hard")
+    const grid = generatePuzzleFromText(puzzlesText)
     return {
         grid,
         givens: grid.map(cell => cell !== null),

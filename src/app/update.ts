@@ -1,7 +1,8 @@
 import type { Model } from "./model"
 
 import type { Msg } from "./msg"
-import { generatePuzzle } from "../domain/generator"
+import { generatePuzzleFromText } from "../domain/generator"
+import puzzlesText from "../../puzzles.txt?raw"
 import { getConflictIndices, isSolved, isValidMove } from "../domain/rules"
 
 export const update = (model: Model, msg: Msg): Model => {
@@ -73,7 +74,7 @@ export const update = (model: Model, msg: Msg): Model => {
         }
 
         case "NewGame":
-            const grid = generatePuzzle("hard")
+            const grid = generatePuzzleFromText(puzzlesText)
             return {
                 grid,
                 givens: grid.map(cell => cell !== null),

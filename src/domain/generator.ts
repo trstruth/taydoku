@@ -82,3 +82,39 @@ export const generatePuzzle = (
 
     return generateSolvedGrid()
 }
+
+export const generatePuzzleFromString = (input: string): Grid => {
+    if (input.length !== 81) {
+        throw new Error("Puzzle input must be exactly 81 characters long.")
+    }
+
+    const cells: Cell[] = Array(81).fill(null)
+    for (let i = 0; i < input.length; i++) {
+        const ch = input[i]
+        if (ch === ".") {
+            cells[i] = null
+            continue
+        }
+        if (ch >= "1" && ch <= "9") {
+            cells[i] = Number(ch) as Value
+            continue
+        }
+        throw new Error(`Invalid puzzle character at index ${i}: "${ch}".`)
+    }
+
+    return cells as Grid
+}
+
+export const generatePuzzleFromText = (input: string): Grid => {
+    const lines = input
+        .split(/\r?\n/)
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+
+    if (lines.length === 0) {
+        throw new Error("Puzzle list is empty.")
+    }
+
+    const picked = lines[Math.floor(Math.random() * lines.length)]
+    return generatePuzzleFromString(picked)
+}
