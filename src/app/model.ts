@@ -1,4 +1,5 @@
-import { Grid } from "../domain/grid"
+import type { Grid } from "../domain/grid"
+import type { Value } from "../domain/cell"
 
 export type Model = {
     grid: Grid
