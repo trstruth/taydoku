@@ -17,11 +17,21 @@ export function GridView(props: {
         return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
     }
 
+    const confirmNewGame = () => {
+        props.dispatch({ type: "RequestNewGame" })
+    }
+
     onMount(() => {
         rootRef?.focus()
     })
 
     const onKeyDown = (event: KeyboardEvent) => {
+        if (props.model.confirmNewGame) {
+            if (event.key === "Escape") {
+                props.dispatch({ type: "CancelNewGame" })
+            }
+            return
+        }
         const key = event.key
         if (key >= "1" && key <= "9") {
             props.dispatch({ type: "EnterValue", value: Number(key) as 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 })
@@ -109,7 +119,32 @@ export function GridView(props: {
                             </button>
                             <button
                                 class="key secondary"
-                                onClick={() => props.dispatch({ type: "NewGame" })}
+                                onClick={confirmNewGame}
+                            >
+                                New Puzzle
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </Show>
+            <Show when={props.model.confirmNewGame}>
+                <div class="modal-backdrop confirm" />
+                <div class="modal confirm" role="dialog" aria-live="polite">
+                    <div class="modal-card">
+                        <div class="modal-title">Are you sure?</div>
+                        <div class="modal-subtitle">
+                            Your current progress will be lost.
+                        </div>
+                        <div class="modal-actions">
+                            <button
+                                class="key secondary"
+                                onClick={() => props.dispatch({ type: "CancelNewGame" })}
+                            >
+                                Cancel
+                            </button>
+                            <button
+                                class="key secondary"
+                                onClick={() => props.dispatch({ type: "ConfirmNewGame" })}
                             >
                                 New Puzzle
                             </button>
@@ -205,7 +240,7 @@ export function GridView(props: {
                 >
                     Notes {props.model.inputMode === "note" ? "On" : "Off"}
                 </button>
-                <button class="key secondary" onClick={() => props.dispatch({ type: "NewGame" })}>
+                <button class="key secondary" onClick={confirmNewGame}>
                     New
                 </button>
             </div>

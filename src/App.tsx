@@ -18,6 +18,7 @@ const createModel = (): Model => {
         invalid: null,
         invalidPulse: 0,
         solved: false,
+        confirmNewGame: false,
         theme: "dark",
         startedAt: Date.now(),
         elapsedMs: 0
@@ -32,6 +33,13 @@ export default function App() {
 
 
     return (
-        <GridView model={model()} dispatch={dispatch} />
+        <div class="app">
+            <div class="app-content">
+                <GridView model={model()} dispatch={dispatch} />
+            </div>
+            <footer class="app-footer">
+                made with love, for my sweetie 
+            </footer>
+        </div>
     )
 }

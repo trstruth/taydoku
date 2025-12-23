@@ -1,3 +1,27 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.app-content {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.app-footer {
+  font-size: 0.75rem;
+  color: var(--note-text);
+  padding: 0.75rem 0 1rem;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
 .game {
   display: grid;
   gap: 1rem;
@@ -32,6 +56,14 @@
   place-items: center;
   z-index: 3;
   pointer-events: none;
+}
+
+.modal-backdrop.confirm {
+  z-index: 4;
+}
+
+.modal.confirm {
+  z-index: 5;
 }
 
 .modal-card {

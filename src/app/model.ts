@@ -10,6 +10,7 @@ export type Model = {
     invalid: { target: number; conflicts: number[] } | null
     invalidPulse: number
     solved: boolean
+    confirmNewGame: boolean
     theme: "dark" | "light"
     startedAt: number | null
     elapsedMs: number

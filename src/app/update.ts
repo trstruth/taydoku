@@ -5,6 +5,24 @@ import { generatePuzzleFromText } from "../domain/generator"
 import puzzlesText from "../../puzzles.txt?raw"
 import { getConflictIndices, isSolved, isValidMove } from "../domain/rules"
 
+const startNewGame = (model: Model): Model => {
+    const grid = generatePuzzleFromText(puzzlesText)
+    return {
+        grid,
+        givens: grid.map(cell => cell !== null),
+        notes: Array.from({ length: 81 }, () => []),
+        inputMode: "value",
+        selected: null,
+        invalid: null,
+        invalidPulse: 0,
+        solved: false,
+        confirmNewGame: false,
+        theme: model.theme,
+        startedAt: Date.now(),
+        elapsedMs: 0
+    }
+}
+
 export const update = (model: Model, msg: Msg): Model => {
     switch (msg.type) {
         case "SelectCell":
@@ -73,21 +91,17 @@ export const update = (model: Model, msg: Msg): Model => {
             }
         }
 
+        case "RequestNewGame":
+            return { ...model, confirmNewGame: true }
+
+        case "CancelNewGame":
+            return { ...model, confirmNewGame: false }
+
+        case "ConfirmNewGame":
+            return startNewGame(model)
+
         case "NewGame":
-            const grid = generatePuzzleFromText(puzzlesText)
-            return {
-                grid,
-                givens: grid.map(cell => cell !== null),
-                notes: Array.from({ length: 81 }, () => []),
-                inputMode: "value",
-                selected: null,
-                invalid: null,
-                invalidPulse: 0,
-                solved: false,
-                theme: model.theme,
-                startedAt: Date.now(),
-                elapsedMs: 0
-            }
+            return startNewGame(model)
 
         case "ClearInvalid":
             if (!model.invalid) return model
