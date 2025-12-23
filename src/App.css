@@ -36,7 +36,7 @@
   grid-template-rows: repeat(9, minmax(0, 1fr));
   width: min(90vw, 540px);
   aspect-ratio: 1;
-  border: 2px solid var(--grid-border);
+  border: 6px solid var(--grid-border);
   background: var(--grid-bg);
 }
 
@@ -114,18 +114,18 @@
   justify-content: center;
   border: 1px solid var(--cell-border);
   font-size: clamp(18px, 3.5vw, 28px);
-  font-weight: 700;
+  font-weight: bold;
   color: var(--text);
   user-select: none;
   background: var(--cell-bg);
 }
 
 .cell.box-right {
-  border-right: 2px solid var(--grid-border);
+  border-right: 4px solid var(--grid-border);
 }
 
 .cell.box-bottom {
-  border-bottom: 2px solid var(--grid-border);
+  border-bottom: 4px solid var(--grid-border);
 }
 
 .cell.selected:not(.invalid-target):not(.conflict) {
@@ -182,7 +182,7 @@
 .keypad {
   display: grid;
   grid-template-columns: repeat(9, minmax(0, 1fr));
-  gap: 0.5rem;
+  gap: 1.5rem;
   width: min(90vw, 540px);
 }
 
