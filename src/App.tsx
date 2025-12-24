@@ -1,4 +1,4 @@
-import { createSignal } from "solid-js"
+import { createEffect, createSignal, onMount } from "solid-js"
 import "./App.css"
 import type { Model } from "./app/model"
 import type { Msg } from "./app/msg"
@@ -6,6 +6,7 @@ import { update } from "./app/update"
 import { GridView } from "./ui/GridView"
 import { generatePuzzleFromText } from "./domain/generator"
 import puzzlesText from "../puzzles.txt?raw"
+import { loadState, saveState } from "./app/persistence"
 
 const createModel = (): Model => {
     const grid = generatePuzzleFromText(puzzlesText)
@@ -27,10 +28,21 @@ const createModel = (): Model => {
 
 export default function App() {
     const [model, setModel] = createSignal(createModel())
+    const [hydrated, setHydrated] = createSignal(false)
 
     const dispatch = (msg: Msg) =>
         setModel(m => update(m, msg))
 
+    onMount(async () => {
+        const saved = await loadState()
+        if (saved) setModel(saved)
+        setHydrated(true)
+    })
+
+    createEffect(() => {
+        if (!hydrated()) return
+        void saveState(model())
+    })
 
     return (
         <div class="app">
