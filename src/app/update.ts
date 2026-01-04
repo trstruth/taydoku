@@ -17,6 +17,7 @@ const startNewGame = (model: Model): Model => {
         invalidPulse: 0,
         solved: false,
         confirmNewGame: false,
+        paused: false,
         theme: model.theme,
         startedAt: Date.now(),
         elapsedMs: 0
@@ -120,16 +121,37 @@ export const update = (model: Model, msg: Msg): Model => {
             }
 
         case "Tick":
-            if (model.startedAt === null || model.solved) return model
+            if (model.startedAt === null || model.solved || model.paused) return model
             return {
                 ...model,
                 elapsedMs: Date.now() - model.startedAt
+            }
+
+        case "PauseTimer":
+            if (model.solved) return model
+            if (model.startedAt === null) {
+                return { ...model, paused: true }
+            }
+            return {
+                ...model,
+                paused: true,
+                elapsedMs: Date.now() - model.startedAt,
+                startedAt: null
+            }
+
+        case "ResumeTimer":
+            if (model.solved || !model.paused) return model
+            return {
+                ...model,
+                paused: false,
+                startedAt: Date.now() - model.elapsedMs
             }
 
         case "Solve":
             return {
                 ...model,
                 solved: true,
+                paused: false,
                 startedAt: null
             }
 

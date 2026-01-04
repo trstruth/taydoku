@@ -12,5 +12,7 @@ export type Msg =
     | { type: "ToggleNoteMode" }
     | { type: "ToggleTheme" }
     | { type: "Tick" }
+    | { type: "PauseTimer" }
+    | { type: "ResumeTimer" }
     | { type: "Solve" }
     | { type: "DismissSolved" }

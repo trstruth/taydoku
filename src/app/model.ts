@@ -11,6 +11,7 @@ export type Model = {
     invalidPulse: number
     solved: boolean
     confirmNewGame: boolean
+    paused: boolean
     theme: "dark" | "light"
     startedAt: number | null
     elapsedMs: number

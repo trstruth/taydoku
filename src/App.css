@@ -66,6 +66,14 @@
   z-index: 5;
 }
 
+.modal-backdrop.pause {
+  z-index: 4;
+}
+
+.modal.pause {
+  z-index: 5;
+}
+
 .modal-card {
   pointer-events: auto;
   display: grid;

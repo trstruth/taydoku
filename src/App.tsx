@@ -20,6 +20,7 @@ const createModel = (): Model => {
         invalidPulse: 0,
         solved: false,
         confirmNewGame: false,
+        paused: false,
         theme: "dark",
         startedAt: Date.now(),
         elapsedMs: 0
@@ -35,7 +36,13 @@ export default function App() {
 
     onMount(async () => {
         const saved = await loadState()
-        if (saved) setModel(saved)
+        if (saved) {
+            setModel({
+                ...createModel(),
+                ...saved,
+                paused: saved.paused ?? false
+            })
+        }
         setHydrated(true)
     })
 

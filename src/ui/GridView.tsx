@@ -26,6 +26,7 @@ export function GridView(props: {
     })
 
     const onKeyDown = (event: KeyboardEvent) => {
+        if (props.model.paused) return
         if (props.model.confirmNewGame) {
             if (event.key === "Escape") {
                 props.dispatch({ type: "CancelNewGame" })
@@ -152,11 +153,39 @@ export function GridView(props: {
                     </div>
                 </div>
             </Show>
+            <Show when={props.model.paused}>
+                <div class="modal-backdrop pause" />
+                <div class="modal pause" role="dialog" aria-live="polite">
+                    <div class="modal-card">
+                        <div class="modal-title">Paused</div>
+                        <div class="modal-time">
+                            {formatElapsed(props.model.elapsedMs)}
+                        </div>
+                        <div class="modal-subtitle">
+                            Timer stopped.
+                        </div>
+                        <div class="modal-actions">
+                            <button
+                                class="key secondary"
+                                onClick={() => props.dispatch({ type: "ResumeTimer" })}
+                            >
+                                Resume
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </Show>
             <div class="toolbar">
                 <div class="timer">
                     {formatElapsed(props.model.elapsedMs)}
                 </div>
                 <div class="toolbar-actions">
+                    <button
+                        class="key secondary"
+                        onClick={() => props.dispatch({ type: "PauseTimer" })}
+                    >
+                        Pause
+                    </button>
                     <button
                         class="key secondary"
                         onClick={() => props.dispatch({ type: "ToggleTheme" })}
